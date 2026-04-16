@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+
+<h1>Dashboard</h1>
+
+<h3>Total Tasks: {{ total }}</h3>
+<h3>Completed: {{ completed }}</h3>
+<h3>Pending: {{ pending }}</h3>
+<h3>Progress: {{ progress }}%</h3>
+
+<hr>
+
+<h2>All Tasks</h2>
+
+<table border="1">
+    <tr>
+        <th>Title</th>
+        <th>Subject</th>
+        <th>Status</th>
+        <th>Deadline</th>
+        <th>Priority</th>
+    </tr>
+
+    {% for task in tasks %}
+    <tr>
+        <td>{{ task.title }}</td>
+        <td>{{ task.subject.name }}</td>
+        <td>{{ task.status }}</td>
+        <td>{{ task.deadline }}</td>
+        <td>{{ task.priority }}</td>
+        <td style="color: {% if task.status == 'completed' %}green{% else %}red{% endif %}">
+    {{ task.status }}
+</td>
+    </tr>
+    {% endfor %}
+    
+
+</table>
+
+</body>
+</html>
