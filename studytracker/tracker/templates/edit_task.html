@@ -2,17 +2,203 @@
 
 {% block title %}Edit Task | StudyTracker{% endblock %}
 
+{% block extra_head %}
+<style>
+    .manage-grid {
+        display: grid;
+        grid-template-columns: 1.35fr 1fr;
+        gap: 18px;
+    }
+
+    .manage-stack {
+        display: grid;
+        gap: 16px;
+    }
+
+    .mini-card {
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.04);
+        padding: 16px;
+    }
+
+    .mini-card h3 {
+        margin: 0 0 10px;
+        font-size: 1.05rem;
+    }
+
+    .mini-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 12px;
+    }
+
+    .mini-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 10px 12px;
+        background: rgba(15, 23, 42, 0.55);
+    }
+
+    .mini-item small {
+        color: var(--muted);
+        display: block;
+        margin-top: 2px;
+    }
+
+    .mini-form {
+        display: grid;
+        gap: 10px;
+    }
+
+    .mini-form p {
+        margin: 0;
+    }
+
+    .mini-empty {
+        color: var(--muted);
+        font-size: 0.92rem;
+        margin-top: 8px;
+    }
+
+    @media (max-width: 980px) {
+        .manage-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <section style="margin-bottom: 22px;">
     <h1 class="page-title">Edit Task</h1>
-    <p class="page-subtitle">Update your task details, deadline, priority, or status.</p>
+    <p class="page-subtitle">Update task details and manage tags, progress logs, attachments, reminders, and study sessions in one place.</p>
 </section>
 
-<div class="form-card">
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit"><i class="bi bi-floppy"></i> Save Changes</button>
-    </form>
+<div class="manage-grid">
+    <div class="form-card">
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="task">
+            {{ form.as_p }}
+            <button type="submit"><i class="bi bi-floppy"></i> Save Task Details</button>
+        </form>
+    </div>
+
+    <div class="manage-stack">
+        <div class="mini-card">
+            <h3><i class="bi bi-graph-up"></i> Progress Logs</h3>
+            <form method="POST" class="mini-form">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="progress">
+                {{ progress_form.as_p }}
+                <button type="submit"><i class="bi bi-plus-circle"></i> Add Progress</button>
+            </form>
+            {% if progress_logs %}
+                <div class="mini-list">
+                    {% for log in progress_logs %}
+                        <div class="mini-item">
+                            <div>
+                                <strong>{{ log.progress_percent }}%</strong>
+                                <small>{{ log.updated_at }}</small>
+                            </div>
+                            <a class="pill-link danger-link" href="{% url 'delete-progress-log' log.id %}" onclick="return confirm('Delete this progress log?');">
+                                <i class="bi bi-trash3"></i>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="mini-empty">No progress logs yet.</div>
+            {% endif %}
+        </div>
+
+        <div class="mini-card">
+            <h3><i class="bi bi-paperclip"></i> Attachments</h3>
+            <form method="POST" enctype="multipart/form-data" class="mini-form">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="attachment">
+                {{ attachment_form.as_p }}
+                <button type="submit"><i class="bi bi-upload"></i> Upload File</button>
+            </form>
+            {% if attachments %}
+                <div class="mini-list">
+                    {% for item in attachments %}
+                        <div class="mini-item">
+                            <div>
+                                <a href="{{ item.file.url }}" target="_blank" rel="noopener">{{ item.file.name }}</a>
+                                <small>{{ item.uploaded_at }}</small>
+                            </div>
+                            <a class="pill-link danger-link" href="{% url 'delete-attachment' item.id %}" onclick="return confirm('Delete this attachment?');">
+                                <i class="bi bi-trash3"></i>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="mini-empty">No attachments uploaded yet.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="manage-grid" style="margin-top: 18px;">
+    <div class="mini-card">
+        <h3><i class="bi bi-bell"></i> Reminders</h3>
+        <form method="POST" class="mini-form">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="reminder">
+            {{ reminder_form.as_p }}
+            <button type="submit"><i class="bi bi-plus-circle"></i> Add Reminder</button>
+        </form>
+        {% if reminders %}
+            <div class="mini-list">
+                {% for item in reminders %}
+                    <div class="mini-item">
+                        <div>
+                            <strong>{{ item.reminder_time }}</strong>
+                            <small>Sent: {{ item.is_sent }}</small>
+                        </div>
+                        <a class="pill-link danger-link" href="{% url 'delete-reminder' item.id %}" onclick="return confirm('Delete this reminder?');">
+                            <i class="bi bi-trash3"></i>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="mini-empty">No reminders yet.</div>
+        {% endif %}
+    </div>
+
+    <div class="mini-card">
+        <h3><i class="bi bi-clock-history"></i> Study Sessions</h3>
+        <form method="POST" class="mini-form">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="session">
+            {{ session_form.as_p }}
+            <button type="submit"><i class="bi bi-plus-circle"></i> Add Session</button>
+        </form>
+        {% if study_sessions %}
+            <div class="mini-list">
+                {% for item in study_sessions %}
+                    <div class="mini-item">
+                        <div>
+                            <strong>{{ item.start_time }} - {{ item.end_time }}</strong>
+                            <small>Tracked session</small>
+                        </div>
+                        <a class="pill-link danger-link" href="{% url 'delete-study-session' item.id %}" onclick="return confirm('Delete this study session?');">
+                            <i class="bi bi-trash3"></i>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="mini-empty">No study sessions logged yet.</div>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
