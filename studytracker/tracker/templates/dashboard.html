@@ -3,22 +3,28 @@
 {% block title %}Dashboard | StudyTracker{% endblock %}
 
 {% block content %}
-<h1 class="page-title">Dashboard</h1>
-<p class="page-subtitle">A focused view of your study workload with progress, priorities, and quick exports.</p>
+<section style="margin-bottom: 22px;">
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">A focused view of your study workload with progress, priorities, and quick exports.</p>
+</section>
 
 <section class="stats-grid" aria-label="Task summary">
-    <div class="stat-card">
+    <a class="stat-card stat-link {% if status_filter == 'all' %}stat-active{% endif %}" href="{% url 'dashboard' %}">
         <div class="label">Total tasks</div>
         <div class="value">{{ total }}</div>
-    </div>
-    <div class="stat-card">
+    </a>
+    <a class="stat-card stat-link {% if status_filter == 'completed' %}stat-active{% endif %}" href="{% url 'dashboard' %}?status=completed">
         <div class="label">Completed</div>
         <div class="value">{{ completed }}</div>
-    </div>
-    <div class="stat-card">
+    </a>
+    <a class="stat-card stat-link {% if status_filter == 'pending' %}stat-active{% endif %}" href="{% url 'dashboard' %}?status=pending">
         <div class="label">Pending</div>
         <div class="value">{{ pending }}</div>
-    </div>
+    </a>
+    <a class="stat-card stat-link {% if status_filter == 'overdue' %}stat-active{% endif %}" href="{% url 'dashboard' %}?status=overdue">
+        <div class="label">Overdue</div>
+        <div class="value">{{ overdue }}</div>
+    </a>
     <div class="stat-card">
         <div class="label">Progress</div>
         <div class="value">{{ progress }}%</div>
@@ -39,8 +45,11 @@
     <div class="panel-title">
         <h2 style="margin: 0;">All Tasks</h2>
         <div class="toolbar">
-            <a class="pill-link" href="{% url 'export-csv' %}">Download CSV</a>
-            <a class="pill-link" href="{% url 'export-pdf' %}">Download PDF</a>
+            {% if status_filter != 'all' %}
+                <a class="pill-link" href="{% url 'dashboard' %}"><i class="bi bi-x-circle"></i> Clear Filter</a>
+            {% endif %}
+            <a class="pill-link" href="{% url 'export-csv' %}"><i class="bi bi-filetype-csv"></i> Download CSV</a>
+            <a class="pill-link" href="{% url 'export-pdf' %}"><i class="bi bi-file-earmark-pdf"></i> Download PDF</a>
         </div>
     </div>
 
@@ -63,17 +72,24 @@
                     <td><strong>{{ task.title }}</strong></td>
                     <td>{{ task.subject.name }}</td>
                     <td>
-                        <span class="status-pill {{ task.status }}">{{ task.status }}</span>
+                        {% if task.deadline < today and task.status != 'completed' %}
+                            <span class="status-pill overdue">Overdue</span>
+                        {% elif task.status == 'completed' %}
+                            <span class="status-pill completed">Completed</span>
+                        {% else %}
+                            <span class="status-pill pending">Pending</span>
+                        {% endif %}
                     </td>
                     <td>{{ task.deadline }}</td>
                     <td>{{ task.priority }}</td>
                     <td>
-                        {% if task.status == 'pending' %}
-                            <a class="pill-link" href="{% url 'complete-task' task.id %}">Complete</a>
-                            <a class="pill-link danger-link" href="{% url 'delete-task' task.id %}">Delete</a>
-                        {% else %}
-                            <span style="color: var(--muted);">No actions needed</span>
-                        {% endif %}
+                        <div class="task-actions">
+                            <a class="pill-link" href="{% url 'edit-task' task.id %}"><i class="bi bi-pencil-square"></i> Edit</a>
+                            {% if task.status == 'pending' %}
+                                <a class="pill-link" href="{% url 'complete-task' task.id %}"><i class="bi bi-check2-circle"></i> Complete</a>
+                            {% endif %}
+                            <a class="pill-link danger-link" href="{% url 'delete-task' task.id %}" onclick="return confirm('Are you sure you want to delete this task?');"><i class="bi bi-trash3"></i> Delete</a>
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}
@@ -82,7 +98,7 @@
     </div>
     {% else %}
     <div class="empty-state">
-        No tasks yet. Add a subject, create your first task, and start tracking progress.
+        No tasks yet. Start by adding one!
     </div>
     {% endif %}
 </section>

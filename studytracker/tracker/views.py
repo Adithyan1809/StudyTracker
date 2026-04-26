@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from .models import Subject, Task
 import csv
 from django.http import HttpResponse
+from django.contrib import messages
+from datetime import date
 
 @login_required  
 def add_subject(request):
@@ -13,6 +15,7 @@ def add_subject(request):
             subject = form.save(commit=False)
             subject.user = request.user
             subject.save()
+            messages.success(request, 'Subject added successfully.')
             return redirect('add-subject')
     else:
         form = SubjectForm()
@@ -27,7 +30,8 @@ def add_task(request):
 
         if form.is_valid():
             form.save()
-            return redirect('add-task')
+            messages.success(request, 'Task added successfully.')
+            return redirect('dashboard')
     else:
         form = TaskForm()
         form.fields['subject'].queryset = Subject.objects.filter(user=request.user)
@@ -35,14 +39,45 @@ def add_task(request):
     return render(request, 'add_task.html', {'form': form})
 
 
+@login_required
+def edit_task(request, task_id):
+    task = get_object_or_404(Task, id=task_id, subject__user=request.user)
+
+    if request.method == 'POST':
+        form = TaskForm(request.POST, instance=task)
+        form.fields['subject'].queryset = Subject.objects.filter(user=request.user)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Task updated successfully.')
+            return redirect('dashboard')
+    else:
+        form = TaskForm(instance=task)
+        form.fields['subject'].queryset = Subject.objects.filter(user=request.user)
+
+    return render(request, 'edit_task.html', {'form': form, 'task': task})
+
+
 
 @login_required
 def dashboard(request):
-    tasks = Task.objects.filter(subject__user=request.user)
+    today = date.today()
+    status_filter = request.GET.get('status', 'all')
 
-    total_tasks = tasks.count()
-    completed_tasks = tasks.filter(status='completed').count()
-    pending_tasks = tasks.filter(status='pending').count()
+    all_tasks = Task.objects.filter(subject__user=request.user).order_by('deadline', '-priority')
+    tasks = all_tasks
+
+    if status_filter == 'pending':
+        tasks = all_tasks.filter(status='pending')
+    elif status_filter == 'completed':
+        tasks = all_tasks.filter(status='completed')
+    elif status_filter == 'overdue':
+        tasks = all_tasks.filter(status='pending', deadline__lt=today)
+
+    total_tasks = all_tasks.count()
+    completed_tasks = all_tasks.filter(status='completed').count()
+    pending_tasks = all_tasks.filter(status='pending').count()
+    overdue_tasks = all_tasks.filter(status='pending', deadline__lt=today).count()
 
     # Avoid division by zero
     progress = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
@@ -52,7 +87,10 @@ def dashboard(request):
         'total': total_tasks,
         'completed': completed_tasks,
         'pending': pending_tasks,
-        'progress': round(progress, 2)
+        'overdue': overdue_tasks,
+        'progress': round(progress, 2),
+        'today': today,
+        'status_filter': status_filter,
     }
 
     return render(request, 'dashboard.html', context)

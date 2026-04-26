@@ -11,6 +11,9 @@ class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = ['subject', 'title', 'description', 'deadline', 'priority', 'status']
+        widgets = {
+            'deadline': forms.DateInput(attrs={'type': 'date'}),
+        }
 
     def clean_priority(self):
         priority = self.cleaned_data.get('priority')

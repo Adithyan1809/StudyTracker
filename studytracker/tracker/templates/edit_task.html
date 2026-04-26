@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Task | StudyTracker{% endblock %}
+
+{% block content %}
+<section style="margin-bottom: 22px;">
+    <h1 class="page-title">Edit Task</h1>
+    <p class="page-subtitle">Update your task details, deadline, priority, or status.</p>
+</section>
+
+<div class="form-card">
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit"><i class="bi bi-floppy"></i> Save Changes</button>
+    </form>
+</div>
+{% endblock %}
