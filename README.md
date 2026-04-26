@@ -1,168 +1,282 @@
-# Study Tracker
+# 📚 Study Tracker
 
-A Django + PostgreSQL web app to manage subjects, track study tasks, and monitor progress with an interactive dashboard.
+A full-stack web application built using **Django** and **PostgreSQL** to help students manage subjects, track tasks, and monitor progress through an intuitive dashboard.
 
-## Overview
+---
 
-Study Tracker helps students organize work by subject and task.
+## 🚀 Overview
 
-Core goals:
-- Keep tasks grouped by subject.
-- Track completion progress clearly.
-- Highlight overdue tasks.
-- Export task data to CSV and PDF.
+Study Tracker is designed to simplify academic planning by organizing tasks under subjects, tracking completion progress, and highlighting deadlines.
 
-## Features
+### 🎯 Key Objectives
 
-### Authentication
-- Login-required access for all tracker features.
-- User-specific data isolation using Django auth.
+* Organize tasks subject-wise
+* Track progress visually
+* Identify overdue tasks
+* Provide exportable reports (CSV & PDF)
 
-### Subject Management
-- Add subjects linked to the logged-in user.
-- Subject creation success feedback via popup and message.
+---
 
-### Task Management
-- Add task.
-- Edit task.
-- Mark task complete.
-- Delete task with confirmation prompt.
-- Task fields:
-  - Title
-  - Description
-  - Deadline
-  - Priority (1-5)
-  - Status (Pending/Completed)
+## ✨ Features
 
-### Dashboard and Analytics
-- Task summary cards:
-  - Total
-  - Completed
-  - Pending
-  - Overdue
-  - Progress percentage
-- Clickable summary cards for status filtering.
-- Deadline-aware status badges:
-  - Overdue
-  - Pending
-  - Completed
-- Tasks sorted by deadline, then priority.
+### 🔐 Authentication
 
-### Export
-- Export tasks as CSV.
-- Export tasks as PDF.
+* Login-required access for all features
+* User-specific data isolation using Django authentication
 
-### UI
-- Responsive custom dashboard and forms.
-- Shared header/footer layout.
+---
 
-## Tech Stack
+### 📚 Subject Management
 
-- Python 3.13
-- Django 6.0.4
-- PostgreSQL
-- Django templates (HTML/CSS)
-- ReportLab (PDF export)
+* Create subjects linked to the logged-in user
+* Instant feedback on successful creation
 
-## Project Structure
+---
+
+### ✅ Task Management
+
+* Add, edit, delete tasks
+* Mark tasks as completed
+* Delete confirmation for safety
+
+**Task Attributes:**
+
+* Title
+* Description
+* Deadline
+* Priority (1–5)
+* Status (Pending / Completed)
+
+---
+
+### 📊 Dashboard & Analytics
+
+* Real-time summary cards:
+
+  * Total Tasks
+  * Completed
+  * Pending
+  * Overdue
+  * Progress (%)
+
+* Interactive filtering via summary cards
+
+* Intelligent status badges:
+
+  * 🔴 Overdue
+  * 🟡 Pending
+  * 🟢 Completed
+
+* Tasks sorted by:
+
+  * Deadline → Priority
+
+---
+
+### 📤 Export Features
+
+* Download tasks as **CSV**
+* Generate **PDF reports**
+
+---
+
+### 🎨 User Interface
+
+* Responsive modern dashboard
+* Clean layout with shared header/footer
+* User-friendly task actions
+
+---
+
+## 🛠️ Tech Stack
+
+* **Backend:** Django 6.0.4 (Python 3.13)
+* **Database:** PostgreSQL
+* **Frontend:** Django Templates (HTML/CSS)
+* **PDF Generation:** ReportLab
+
+---
+
+## 📁 Project Structure
 
 ```
 StudyTracker/
-  README.md
-  requirements.txt
-  studytracker/
-    manage.py
-    studytracker/
-      settings.py
-      urls.py
-      asgi.py
-      wsgi.py
-    tracker/
-      models.py
-      views.py
-      forms.py
-      urls.py
-      admin.py
-      migrations/
-      templates/
-        base.html
-        dashboard.html
-        add_subject.html
-        add_task.html
-        edit_task.html
+│
+├── README.md
+├── requirements.txt
+│
+└── studytracker/
+    ├── manage.py
+    │
+    ├── studytracker/
+    │   ├── settings.py
+    │   ├── urls.py
+    │   ├── asgi.py
+    │   └── wsgi.py
+    │
+    └── tracker/
+        ├── models.py
+        ├── views.py
+        ├── forms.py
+        ├── urls.py
+        ├── admin.py
+        ├── migrations/
+        │
+        └── templates/
+            ├── base.html
+            ├── dashboard.html
+            ├── add_subject.html
+            ├── add_task.html
+            └── edit_task.html
 ```
 
-## Data Model
+---
 
-### Subject
-- user -> ForeignKey to Django User
-- name
-- created_at
+## 🗄️ Data Model
 
-### Task
-- subject -> ForeignKey to Subject
-- title
-- description
-- deadline
-- priority (1-5)
-- status (pending/completed)
-- created_at
+### 📘 Subject
 
-### Relationships
-- One User has many Subjects.
-- One Subject has many Tasks.
+* `user` → ForeignKey (Django User)
+* `name`
+* `created_at`
 
-## Requirements
+---
 
-Dependencies are listed in requirements.txt.
+### 📘 Task
 
-## Setup and Run
+* `subject` → ForeignKey (Subject)
+* `title`
+* `description`
+* `deadline`
+* `priority (1–5)`
+* `status (pending/completed)`
+* `created_at`
 
-1. Create and activate a virtual environment.
-2. Install dependencies.
-3. Configure PostgreSQL database settings in studytracker/studytracker/settings.py.
-4. Run migrations.
-5. Create a superuser (optional, for admin).
-6. Start the server.
+---
 
-Example commands:
+### 🔗 Relationships
+
+* One **User** → Multiple **Subjects**
+* One **Subject** → Multiple **Tasks**
+
+---
+
+## ⚙️ Setup & Installation
+
+### 1️⃣ Clone the Repository
 
 ```bash
-cd studytracker
-python -m pip install -r ../requirements.txt
+git clone https://github.com/Adithyan1809/study-tracker.git
+cd study-tracker
+```
+
+---
+
+### 2️⃣ Create Virtual Environment
+
+```bash
+python -m venv venv
+venv\Scripts\activate   # Windows
+```
+
+---
+
+### 3️⃣ Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+### 4️⃣ Configure PostgreSQL
+
+Update database settings in:
+
+```
+studytracker/settings.py
+```
+
+---
+
+### 5️⃣ Run Migrations
+
+```bash
 python manage.py makemigrations
 python manage.py migrate
+```
+
+---
+
+### 6️⃣ Create Superuser (Optional)
+
+```bash
 python manage.py createsuperuser
+```
+
+---
+
+### 7️⃣ Run Server
+
+```bash
 python manage.py runserver
 ```
 
-Open in browser:
+---
 
-```text
+### 🌐 Open in Browser
+
+```
 http://127.0.0.1:8000/
 ```
 
-## Main Routes
+---
 
-- / -> Dashboard
-- /add-subject/ -> Add Subject
-- /add-task/ -> Add Task
-- /edit-task/<task_id>/ -> Edit Task
-- /complete-task/<task_id>/ -> Mark Complete
-- /delete-task/<task_id>/ -> Delete Task
-- /export-csv/ -> CSV Export
-- /export-pdf/ -> PDF Export
-- /admin/ -> Django Admin
+## 🔗 Application Routes
 
-## Notes
+| Route                  | Description        |
+| ---------------------- | ------------------ |
+| `/`                    | Dashboard          |
+| `/add-subject/`        | Add Subject        |
+| `/add-task/`           | Add Task           |
+| `/edit-task/<id>/`     | Edit Task          |
+| `/complete-task/<id>/` | Mark Task Complete |
+| `/delete-task/<id>/`   | Delete Task        |
+| `/export-csv/`         | Export CSV         |
+| `/export-pdf/`         | Export PDF         |
+| `/admin/`              | Django Admin Panel |
 
-- Project currently uses PostgreSQL in settings.
-- For production usage, move secrets and DB credentials to environment variables.
+---
 
-## Team
+## ⚠️ Notes
 
-Developed by:
-- Adithyan P
-- Pavan Gowda K
-- Pracheth Singh
+* PostgreSQL is used as the primary database
+* For production:
 
+  * Use environment variables for credentials
+  * Disable debug mode
+  * Configure proper hosting (Gunicorn/Nginx)
+
+---
+
+## 🌟 Highlights
+
+* Clean relational database design
+* User-specific data handling
+* Real-time analytics dashboard
+* Export functionality (CSV & PDF)
+* Practical full-stack implementation
+
+---
+
+## 👨‍💻 Team
+
+* **Adithyan P**
+* **Pavan Gowda K**
+* **Pracheth Singh**
+
+---
+
+## 📌 Final Note
+
+This project is built as part of academic coursework while focusing on real-world development practices, scalability, and usability.
