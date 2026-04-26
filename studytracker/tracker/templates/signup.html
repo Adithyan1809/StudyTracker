@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up | StudyTracker{% endblock %}
+
+{% block content %}
+<section style="margin-bottom: 22px;">
+    <h1 class="page-title">Create Account</h1>
+    <p class="page-subtitle">Sign up to start tracking tasks, deadlines, reminders, and your study sessions.</p>
+</section>
+
+<div class="form-card">
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit"><i class="bi bi-person-plus"></i> Sign Up</button>
+    </form>
+    <p style="margin-top: 14px; color: var(--muted);">
+        Already have an account? <a class="pill-link" href="{% url 'login' %}">Login</a>
+    </p>
+</div>
+{% endblock %}

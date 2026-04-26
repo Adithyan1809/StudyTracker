@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 from .views import (
     add_subject,
     add_task,
@@ -12,9 +13,13 @@ from .views import (
     export_csv,
     export_pdf,
     mark_complete,
+    signup,
 )
 
 urlpatterns = [
+    path('login/', auth_views.LoginView.as_view(template_name='login.html', redirect_authenticated_user=True), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('signup/', signup, name='signup'),
     path('', dashboard, name='dashboard'),
     path('add-subject/', add_subject, name='add-subject'),
     path('add-task/', add_task, name='add-task'),

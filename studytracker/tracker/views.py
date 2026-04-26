@@ -1,12 +1,31 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import AttachmentForm, ProgressLogForm, ReminderForm, StudySessionForm, SubjectForm, TaskForm
 from django.contrib.auth.decorators import login_required 
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
 from .models import Attachment, ProgressLog, Reminder, StudySession, Subject, Task
 import csv
 from django.http import HttpResponse
 from django.contrib import messages
 from datetime import date
 from django.db.models import Case, IntegerField, Value, When
+
+
+def signup(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, 'Account created successfully. Welcome!')
+            return redirect('dashboard')
+    else:
+        form = UserCreationForm()
+
+    return render(request, 'signup.html', {'form': form})
 
 @login_required  
 def add_subject(request):

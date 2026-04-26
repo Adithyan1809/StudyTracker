@@ -461,9 +461,15 @@
                 <span>Plan your day and jump to key actions quickly.</span>
             </div>
             <nav class="navlinks">
-                <a class="active-nav" href="{% url 'dashboard' %}">Dashboard</a>
-                <a href="{% url 'add-subject' %}">Add Subject</a>
-                <a class="primary-link" href="{% url 'add-task' %}">Add Task</a>
+                {% if user.is_authenticated %}
+                    <a class="active-nav" href="{% url 'dashboard' %}">Dashboard</a>
+                    <a href="{% url 'add-subject' %}">Add Subject</a>
+                    <a href="{% url 'add-task' %}">Add Task</a>
+                    <a class="pill-link" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}">Login</a>
+                    <a class="primary-link" href="{% url 'signup' %}">Sign Up</a>
+                {% endif %}
             </nav>
         </header>
 
