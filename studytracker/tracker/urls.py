@@ -13,12 +13,13 @@ from .views import (
     export_csv,
     export_pdf,
     mark_complete,
+    logout_user,
     signup,
 )
 
 urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='login.html', redirect_authenticated_user=True), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('logout/', logout_user, name='logout'),
     path('signup/', signup, name='signup'),
     path('', dashboard, name='dashboard'),
     path('add-subject/', add_subject, name='add-subject'),

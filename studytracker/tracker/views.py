@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import AttachmentForm, ProgressLogForm, ReminderForm, StudySessionForm, SubjectForm, TaskForm
 from django.contrib.auth.decorators import login_required 
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from .models import Attachment, ProgressLog, Reminder, StudySession, Subject, Task
 import csv
 from django.http import HttpResponse
@@ -26,6 +26,13 @@ def signup(request):
         form = UserCreationForm()
 
     return render(request, 'signup.html', {'form': form})
+
+
+def logout_user(request):
+    if request.user.is_authenticated:
+        logout(request)
+        messages.success(request, 'You have been logged out.')
+    return redirect('login')
 
 @login_required  
 def add_subject(request):
