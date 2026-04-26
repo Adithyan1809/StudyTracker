@@ -23,6 +23,7 @@
         <th>Status</th>
         <th>Deadline</th>
         <th>Priority</th>
+        <th>Actions</th>
     </tr>
 
     {% for task in tasks %}
@@ -32,7 +33,15 @@
         <td>{{ task.status }}</td>
         <td>{{ task.deadline }}</td>
         <td>{{ task.priority }}</td>
+        <td>
+    {% if task.status == 'pending' %}
+        <a href="{% url 'complete-task' task.id %}">✅ Complete</a>
+        <a href="{% url 'delete-task' task.id %}">❌ Delete</a>
+
+    {% endif %}
+</td>
         <td style="color: {% if task.status == 'completed' %}green{% else %}red{% endif %}">
+        
     {{ task.status }}
 </td>
     </tr>
