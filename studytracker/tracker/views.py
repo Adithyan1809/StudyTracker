@@ -1,7 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .forms import SubjectForm, TaskForm
 from django.contrib.auth.decorators import login_required 
 from .models import Subject, Task
+import csv
+from django.http import HttpResponse
+
 @login_required  
 def add_subject(request):
     if request.method == 'POST':
@@ -66,3 +69,54 @@ def delete_task(request, task_id):
     task = get_object_or_404(Task, id=task_id, subject__user=request.user)
     task.delete()
     return redirect('dashboard')
+
+
+
+@login_required
+def export_csv(request):
+    tasks = Task.objects.filter(subject__user=request.user)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="tasks.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Title', 'Subject', 'Status', 'Deadline', 'Priority'])
+
+    for task in tasks:
+        writer.writerow([
+            task.title,
+            task.subject.name,
+            task.status,
+            task.deadline,
+            task.priority
+        ])
+
+    return response
+
+from reportlab.platypus import SimpleDocTemplate, Table
+from django.http import HttpResponse
+
+@login_required
+def export_pdf(request):
+    tasks = Task.objects.filter(subject__user=request.user)
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="tasks.pdf"'
+
+    doc = SimpleDocTemplate(response)
+
+    data = [['Title', 'Subject', 'Status', 'Deadline', 'Priority']]
+
+    for task in tasks:
+        data.append([
+            task.title,
+            task.subject.name,
+            task.status,
+            str(task.deadline),
+            task.priority
+        ])
+
+    table = Table(data)
+    doc.build([table])
+
+    return response

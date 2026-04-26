@@ -1,17 +1,16 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Subject</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h2>Add Subject</h2>
+{% block title %}Add Subject | StudyTracker{% endblock %}
 
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save</button>
-</form>
+{% block content %}
+<h1 class="page-title">Add Subject</h1>
+<p class="page-subtitle">Create a dedicated subject space so your tasks stay organized by class, topic, or exam.</p>
 
-</body>
-</html>
+<div class="form-card">
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save Subject</button>
+    </form>
+</div>
+{% endblock %}

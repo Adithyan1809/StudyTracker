@@ -1,17 +1,16 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Task</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h2>Add Task</h2>
+{% block title %}Add Task | StudyTracker{% endblock %}
 
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save Task</button>
-</form>
+{% block content %}
+<h1 class="page-title">Add Task</h1>
+<p class="page-subtitle">Capture assignments, deadlines, and priority in one clean place so nothing slips through.</p>
 
-</body>
-</html>
+<div class="form-card">
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save Task</button>
+    </form>
+</div>
+{% endblock %}

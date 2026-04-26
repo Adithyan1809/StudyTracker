@@ -1,54 +1,89 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Dashboard</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h1>Dashboard</h1>
+{% block title %}Dashboard | StudyTracker{% endblock %}
 
-<h3>Total Tasks: {{ total }}</h3>
-<h3>Completed: {{ completed }}</h3>
-<h3>Pending: {{ pending }}</h3>
-<h3>Progress: {{ progress }}%</h3>
+{% block content %}
+<h1 class="page-title">Dashboard</h1>
+<p class="page-subtitle">A focused view of your study workload with progress, priorities, and quick exports.</p>
 
-<hr>
+<section class="stats-grid" aria-label="Task summary">
+    <div class="stat-card">
+        <div class="label">Total tasks</div>
+        <div class="value">{{ total }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">Completed</div>
+        <div class="value">{{ completed }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">Pending</div>
+        <div class="value">{{ pending }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">Progress</div>
+        <div class="value">{{ progress }}%</div>
+    </div>
+</section>
 
-<h2>All Tasks</h2>
+<section class="progress-shell">
+    <div class="panel-title">
+        <h2 style="margin: 0;">Study Progress</h2>
+        <span style="color: var(--muted);">{{ progress }}% complete</span>
+    </div>
+    <div class="progress-track" aria-hidden="true">
+        <div class="progress-fill" style="width: {{ progress }}%;"></div>
+    </div>
+</section>
 
-<table border="1">
-    <tr>
-        <th>Title</th>
-        <th>Subject</th>
-        <th>Status</th>
-        <th>Deadline</th>
-        <th>Priority</th>
-        <th>Actions</th>
-    </tr>
+<section>
+    <div class="panel-title">
+        <h2 style="margin: 0;">All Tasks</h2>
+        <div class="toolbar">
+            <a class="pill-link" href="{% url 'export-csv' %}">Download CSV</a>
+            <a class="pill-link" href="{% url 'export-pdf' %}">Download PDF</a>
+        </div>
+    </div>
 
-    {% for task in tasks %}
-    <tr>
-        <td>{{ task.title }}</td>
-        <td>{{ task.subject.name }}</td>
-        <td>{{ task.status }}</td>
-        <td>{{ task.deadline }}</td>
-        <td>{{ task.priority }}</td>
-        <td>
-    {% if task.status == 'pending' %}
-        <a href="{% url 'complete-task' task.id %}">✅ Complete</a>
-        <a href="{% url 'delete-task' task.id %}">❌ Delete</a>
-
+    {% if tasks %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th>Deadline</th>
+                    <th>Priority</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks %}
+                <tr>
+                    <td><strong>{{ task.title }}</strong></td>
+                    <td>{{ task.subject.name }}</td>
+                    <td>
+                        <span class="status-pill {{ task.status }}">{{ task.status }}</span>
+                    </td>
+                    <td>{{ task.deadline }}</td>
+                    <td>{{ task.priority }}</td>
+                    <td>
+                        {% if task.status == 'pending' %}
+                            <a class="pill-link" href="{% url 'complete-task' task.id %}">Complete</a>
+                            <a class="pill-link danger-link" href="{% url 'delete-task' task.id %}">Delete</a>
+                        {% else %}
+                            <span style="color: var(--muted);">No actions needed</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        No tasks yet. Add a subject, create your first task, and start tracking progress.
+    </div>
     {% endif %}
-</td>
-        <td style="color: {% if task.status == 'completed' %}green{% else %}red{% endif %}">
-        
-    {{ task.status }}
-</td>
-    </tr>
-    {% endfor %}
-    
-
-</table>
-
-</body>
-</html>
+</section>
+{% endblock %}
